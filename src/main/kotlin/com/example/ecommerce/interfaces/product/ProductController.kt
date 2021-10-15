@@ -1,4 +1,4 @@
-package com.example.ecommerce.interfaces.controller.product
+package com.example.ecommerce.interfaces.product
 
 import org.springframework.stereotype.Controller
 
