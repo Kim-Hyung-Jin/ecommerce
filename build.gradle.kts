@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.5.31"
 	kotlin("plugin.spring") version "1.5.31"
 	kotlin("plugin.jpa") version "1.5.31"
+	kotlin("kapt") version "1.5.31"
 }
 
 group = "com.example"
@@ -30,6 +31,29 @@ dependencies {
 	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	// mapstruct
+	implementation("org.mapstruct:mapstruct:1.4.2.Final")
+	kapt("org.mapstruct:mapstruct-processor:1.4.2.Final")
+	kaptTest("org.mapstruct:mapstruct-processor:1.4.2.Final")
+
+	// kotest
+	testImplementation("io.kotest:kotest-runner-junit5:4.3.0") // for kotest framework
+	testImplementation("io.kotest:kotest-assertions-core:4.3.0") // for kotest core jvm assertions
+	testImplementation("io.kotest:kotest-property:4.3.0") // for
+	testImplementation("io.kotest:kotest-extensions-spring:4.3.0")
+
+	// fixture
+	testImplementation("com.appmattus.fixture:fixture:1.1.0")
+
+	//mokcito
+	testImplementation("org.mockito:mockito-inline")
+
+	//jackson
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+
 }
 
 tasks.withType<KotlinCompile> {
