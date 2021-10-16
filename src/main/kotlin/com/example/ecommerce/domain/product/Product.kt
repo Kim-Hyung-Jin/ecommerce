@@ -1,14 +1,28 @@
 package com.example.ecommerce.domain.product
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import com.example.ecommerce.domain.product.optiongroup.ProductOptionGroup
+import javax.persistence.*
 
 @Entity
-class Product {
+class Product(
+    name: String,
+    price: Int,
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0L // TODO 옵셔널 ? 왜 롱 ?
+
+    @OneToMany
+    var productOptionGroupList: List<ProductOptionGroup>? = null
+        private set
+
+    var name: String = name
+        private set
+
+    var price: Int = price
+        private set
+
+
+
 
 }
