@@ -31,6 +31,7 @@ dependencies {
 	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 
 	// mapstruct
 	implementation("org.mapstruct:mapstruct:1.4.2.Final")
@@ -48,6 +49,9 @@ dependencies {
 
 	//mokcito
 	testImplementation("org.mockito:mockito-inline")
+
+	//jackson
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 
 }

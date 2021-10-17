@@ -1,5 +1,6 @@
 package com.example.ecommerce.domain.product
 
+import com.example.ecommerce.application.ProductResult
 import com.example.ecommerce.domain.product.option.ProductOption
 import com.example.ecommerce.domain.product.optiongroup.ProductOptionGroup
 import org.mapstruct.*
@@ -18,13 +19,26 @@ interface ProductCommandMapper {
 
 
     @Mappings(
-        Mapping(source = "productOptionGroupInfoList", target = "productOptionGroupList")
+        Mapping(source = "info", target = "productInfo"),
+        Mapping(target = "copy", ignore = true)
     )
-    fun of(entity: Product, productOptionGroupInfoList: List<ProductInfo.ProductOptionGroupInfo>): ProductInfo.ProductMain
+    fun of(info: ProductInfo.ProductMain): ProductResult.ProductMain
+
+    @Mappings(
+        Mapping(source = "productOptionGroupInfoList", target = "productOptionGroupList"),
+    )
+    fun of(
+        entity: Product,
+        productOptionGroupInfoList: List<ProductInfo.ProductOptionGroupInfo>
+    ): ProductInfo.ProductMain
 
     @Mappings(
         Mapping(source = "productOptionInfoList", target = "productOptionList")
     )
-    fun of(entity: ProductOptionGroup, productOptionInfoList: List<ProductInfo.ProductOptionInfo>): ProductInfo.ProductOptionGroupInfo
+    fun of(
+        entity: ProductOptionGroup,
+        productOptionInfoList: List<ProductInfo.ProductOptionInfo>
+    ): ProductInfo.ProductOptionGroupInfo
+
     fun of(entity: ProductOption): ProductInfo.ProductOptionInfo
 }

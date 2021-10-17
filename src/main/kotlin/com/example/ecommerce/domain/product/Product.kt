@@ -34,6 +34,18 @@ class Product(
         PREPARE("판매준비중"), ON_SALE("판매중"), END_OF_SALE("판매종료");
     }
 
+    fun onSale() {
+        this.status = Status.ON_SALE
+    }
+
+    fun endOfSale() {
+        this.status = Status.END_OF_SALE
+    }
+
+    fun isSaleable(): Boolean {
+        return this.status == Status.ON_SALE
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

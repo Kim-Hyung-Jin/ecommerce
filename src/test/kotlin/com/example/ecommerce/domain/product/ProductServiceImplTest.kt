@@ -293,6 +293,7 @@ class ProductServiceImplTest : FreeSpec(){
                         val expectedInfo = ProductInfo.ProductMain(
                             productName = product.productName,
                             productPrice = product.productPrice,
+                            productCode = productCode,
                             status = product.status,
                             productOptionGroupList = productOptionGroupInfoList
                         )

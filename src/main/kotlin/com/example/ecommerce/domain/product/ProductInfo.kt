@@ -4,6 +4,7 @@ class ProductInfo {
     data class ProductMain(
         val productName: String,
         val productPrice: Long,
+        val productCode: String,
         val status: Product.Status,
         val productOptionGroupList: List<ProductOptionGroupInfo>
     )
