@@ -10,7 +10,6 @@ class ProductServiceImpl(
 ): ProductService {
     override fun registerProduct(command: ProductCommand.RegisterProduct): String {
         val initProduct = productCommandMapper.to(command)
-        println("initProduct -> $initProduct")
         val product = productStore.store(initProduct)
 
         return product.productCode

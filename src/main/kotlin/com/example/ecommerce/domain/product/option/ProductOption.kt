@@ -6,7 +6,7 @@ import javax.persistence.*
 class ProductOption(
     productOptionName: String,
     ordering: Int,
-    optionPrice: Int
+    productOptionPrice: Long
 
 ) {
     @Id
@@ -19,7 +19,7 @@ class ProductOption(
     var ordering: Int = ordering
         private set
 
-    var productOptionPrice: Int = optionPrice
+    var productOptionPrice: Long = productOptionPrice
         private set
 
     override fun equals(other: Any?): Boolean {
@@ -40,7 +40,7 @@ class ProductOption(
         var result = id.hashCode()
         result = 31 * result + productOptionName.hashCode()
         result = 31 * result + ordering
-        result = 31 * result + productOptionPrice
+        result = (31 * result + productOptionPrice).toInt()
         return result
     }
 
