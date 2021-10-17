@@ -25,6 +25,6 @@ interface ProductCommandMapper {
     @Mappings(
         Mapping(source = "productOptionInfoList", target = "productOptionList")
     )
-    fun of(entity: ProductOptionGroup, productOptionInfoList: List<ProductOption>): ProductInfo.ProductOptionGroupInfo
+    fun of(entity: ProductOptionGroup, productOptionInfoList: List<ProductInfo.ProductOptionInfo>): ProductInfo.ProductOptionGroupInfo
     fun of(entity: ProductOption): ProductInfo.ProductOptionInfo
 }
