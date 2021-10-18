@@ -15,6 +15,7 @@ import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.spring.SpringListener
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.util.*
+import javax.persistence.EntityNotFoundException
 
 @WebMvcTest(
     ObjectMapper::class,
@@ -187,9 +189,7 @@ class ProductControllerTest : FreeSpec() {
                     productName = "그릭요거트 500g",
                     productPrice = 20000,
                     productOptionGroupList = productOptionGroupList
-                )  // TODO 커맨드 다시 만들어야함
-
-                println("@@ -> ${mapper.writeValueAsString(request)}")
+                )
 
                 "정상적으로 상품 코드를 응답" - {
                     Mockito.`when`(productFacade.registerProduct(command)).thenReturn(expectedInfo.productCode)
@@ -260,45 +260,30 @@ class ProductControllerTest : FreeSpec() {
         }
 
         "상품 조회 시 " - {
-//            "등록된 상품이 없을 때" - { // TODO advicecontroller 로직 처리 필요
-//
-//
-//                val productCode = UUID.randomUUID().toString()
-//                val criteria = ProductCriteria.GetProduct(
-//                    productCode = productCode
-//                )
-//                val expectedInfo = ProductInfo.ProductMain(
-//                    productName = fixture<String>(),
-//                    productPrice = fixture<Long>(),
-//                    productCode = productCode,
-//                    status = fixture<Product.Status>(),
-//                    productOptionGroupList = null
-//                )
-//
-//                val expectedResult = ProductResult.ProductMain(
-//                    productInfo = expectedInfo
-//                )
-//
-//                val expectedResponse = ProductResponse.RegisterProduct(
-//                    productCode = expectedResult.productInfo.productCode
-//                )
-//
-//                "정상적으로 상품 코드를 응답" - {
-//                    Mockito.`when`(productFacade.getProduct(criteria)).thenReturn(expectedResult)
-//                    val actual = mockMvc.perform(
-//                        get("/api/v1/products/$productCode")
-//                            .contentType(MediaType.APPLICATION_JSON)
-//                    )
-//                        .andDo(MockMvcResultHandlers.print())
-//                        .andExpect(MockMvcResultMatchers.status().isOk)
-//                        .andReturn()
-//
-//                    val content = actual.response.contentAsString
-//                    val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
-//
-//                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
-//                }
-//            }
+            "등록된 상품이 없을 때" - { // TODO advicecontroller 로직 처리 필요
+
+                val productCode = UUID.randomUUID().toString()
+                val criteria = ProductCriteria.GetProduct(
+                    productCode = productCode
+                )
+                "정상적으로 상품 코드를 응답" - {
+                    Mockito.`when`(productFacade.getProduct(criteria)).thenThrow(EntityNotFoundException("찾을 수 없는 엔티티"))
+                    val actual = mockMvc.perform(
+                        get("/api/v1/products/$productCode")
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                        .andDo(MockMvcResultHandlers.print())
+                        .andExpect(MockMvcResultMatchers.status().is4xxClientError)
+                        .andExpect { result ->
+                            assertTrue(result.resolvedException is EntityNotFoundException)
+                        }
+                        .andReturn()
+
+                    val content = actual.response.contentAsString
+                    val response = mapper.readValue<ApiResult<Unit>>(content)
+                    Assertions.assertThat(response)
+                }
+            }
 
             "추가 옵션이 없는 상품이 존재 할 때" - {
 
