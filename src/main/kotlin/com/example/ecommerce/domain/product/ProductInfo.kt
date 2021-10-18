@@ -6,7 +6,7 @@ class ProductInfo {
         val productPrice: Long,
         val productCode: String,
         val status: Product.Status,
-        val productOptionGroupList: List<ProductOptionGroupInfo>
+        val productOptionGroupList: List<ProductOptionGroupInfo>?
     )
 
     data class ProductOptionGroupInfo(

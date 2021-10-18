@@ -5,6 +5,7 @@ import com.example.ecommerce.application.ProductFacade
 import com.example.ecommerce.application.ProductResult
 import com.example.ecommerce.domain.product.Product
 import com.example.ecommerce.domain.product.ProductCommand
+import com.example.ecommerce.domain.product.ProductCriteria
 import com.example.ecommerce.domain.product.ProductInfo
 import com.example.ecommerce.domain.product.option.ProductOption
 import com.example.ecommerce.domain.product.optiongroup.ProductOptionGroup
@@ -20,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -177,16 +179,22 @@ class ProductControllerTest : FreeSpec() {
                     productInfo = expectedInfo
                 )
 
+                val expectedResponse = ProductResponse.RegisterProduct(
+                    productCode = expectedResult.productInfo.productCode
+                )
+
                 val command = ProductCommand.RegisterProduct(
                     productName = "그릭요거트 500g",
                     productPrice = 20000,
                     productOptionGroupList = productOptionGroupList
                 )  // TODO 커맨드 다시 만들어야함
 
+                println("@@ -> ${mapper.writeValueAsString(request)}")
+
                 "정상적으로 상품 코드를 응답" - {
                     Mockito.`when`(productFacade.registerProduct(command)).thenReturn(expectedInfo.productCode)
                     val actual = mockMvc.perform(
-                        post("/api/v1/product")
+                        post("/api/v1/products")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(request))
                     )
@@ -197,48 +205,234 @@ class ProductControllerTest : FreeSpec() {
                     val content = actual.response.contentAsString
                     val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
 
-                    Assertions.assertThat(response.data).isEqualTo(expectedResult)
+                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
                 }
             }
 
-//            "추가 옵션 없을 때" - {
-//                val command = ProductCommand.RegisterProduct(
-//                    productName = "그릭요거트 500g",
-//                    productPrice = 20000,
+            "추가 옵션 없을 때" - {
+                val request = ProductRequest.RegisterProduct(
+                    productName = "그릭요거트 500g",
+                    productPrice = 20000,
+                    productOptionGroupList = null
+                )
+
+                val productCode = UUID.randomUUID().toString()
+                val expectedInfo = ProductInfo.ProductMain(
+                    productName = request.productName,
+                    productPrice = request.productPrice,
+                    productCode = productCode,
+                    status = Product.Status.PREPARE,
+                    productOptionGroupList = null
+                )
+
+                val expectedResult = ProductResult.ProductMain(
+                    productInfo = expectedInfo
+                )
+
+                val expectedResponse = ProductResponse.RegisterProduct(
+                    productCode = expectedResult.productInfo.productCode
+                )
+
+                val command = ProductCommand.RegisterProduct(
+                    productName = "그릭요거트 500g",
+                    productPrice = 20000,
+                    productOptionGroupList = null
+                )
+
+                "정상적으로 상품 코드를 응답" - {
+                    Mockito.`when`(productFacade.registerProduct(command)).thenReturn(expectedInfo.productCode)
+                    val actual = mockMvc.perform(
+                        post("/api/v1/products")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(request))
+                    )
+                        .andDo(MockMvcResultHandlers.print())
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+
+                    val content = actual.response.contentAsString
+                    val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
+
+                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
+                }
+
+            }
+        }
+
+        "상품 조회 시 " - {
+//            "등록된 상품이 없을 때" - { // TODO advicecontroller 로직 처리 필요
+//
+//
+//                val productCode = UUID.randomUUID().toString()
+//                val criteria = ProductCriteria.GetProduct(
+//                    productCode = productCode
+//                )
+//                val expectedInfo = ProductInfo.ProductMain(
+//                    productName = fixture<String>(),
+//                    productPrice = fixture<Long>(),
+//                    productCode = productCode,
+//                    status = fixture<Product.Status>(),
 //                    productOptionGroupList = null
 //                )
 //
+//                val expectedResult = ProductResult.ProductMain(
+//                    productInfo = expectedInfo
+//                )
+//
+//                val expectedResponse = ProductResponse.RegisterProduct(
+//                    productCode = expectedResult.productInfo.productCode
+//                )
+//
 //                "정상적으로 상품 코드를 응답" - {
-//                    val mockUUID = UUID.randomUUID()
-//                    Mockito.mockStatic(UUID::class.java).use { mockedUuid ->
-//                        mockedUuid.`when`<Any> { UUID.randomUUID().toString() }.thenReturn(mockUUID)
+//                    Mockito.`when`(productFacade.getProduct(criteria)).thenReturn(expectedResult)
+//                    val actual = mockMvc.perform(
+//                        get("/api/v1/products/$productCode")
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                    )
+//                        .andDo(MockMvcResultHandlers.print())
+//                        .andExpect(MockMvcResultMatchers.status().isOk)
+//                        .andReturn()
 //
-//                        val productCode = mockUUID.toString()
-//                        val status = Product.Status.PREPARE
-//                        val entity = Product(
-//                            productName = command.productName,
-//                            productPrice = command.productPrice,
-//                            productOptionGroupList = null
-//                        )
-//                        ReflectionTestUtils.setField(entity, "status", status)
-//                        ReflectionTestUtils.setField(entity, "productCode", productCode)
+//                    val content = actual.response.contentAsString
+//                    val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
 //
-//                        val expectedEntity = Product(
-//                            productName = entity.productName,
-//                            productPrice = entity.productPrice,
-//                            productOptionGroupList = null
-//                        )
-//                        ReflectionTestUtils.setField(expectedEntity, "status", status)
-//                        ReflectionTestUtils.setField(expectedEntity, "productCode", productCode)
-//
-//                        Mockito.`when`(productStore.store(expectedEntity)).thenReturn(expectedEntity)
-//
-//                        val res = productService.registerProduct(command)
-//                        Assertions.assertThat(res).isEqualTo(productCode)
-//                    }
+//                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
 //                }
 //            }
+
+            "추가 옵션이 없는 상품이 존재 할 때" - {
+
+                val productCode = UUID.randomUUID().toString()
+                val criteria = ProductCriteria.GetProduct(
+                    productCode = productCode
+                )
+                val expectedInfo = ProductInfo.ProductMain(
+                    productName = fixture<String>(),
+                    productPrice = fixture<Long>(),
+                    productCode = productCode,
+                    status = fixture<Product.Status>(),
+                    productOptionGroupList = null
+                )
+
+                val expectedResult = ProductResult.ProductMain(
+                    productInfo = expectedInfo
+                )
+
+                val expectedResponse = ProductResponse.RegisterProduct(
+                    productCode = expectedResult.productInfo.productCode
+                )
+
+                "정상적으로 상품 코드를 응답" - {
+                    Mockito.`when`(productFacade.getProduct(criteria)).thenReturn(expectedResult)
+                    val actual = mockMvc.perform(
+                        get("/api/v1/products/$productCode")
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                        .andDo(MockMvcResultHandlers.print())
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+
+                    val content = actual.response.contentAsString
+                    val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
+
+                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
+                }
+            }
+
+            "추가 옵션을 등록한 상품이 존재 할 때" - {
+
+
+
+                val granolaProductOption = ProductInfo.ProductOptionInfo(
+                    productOptionName = "그래놀라 500g",
+                    ordering = 1,
+                    productOptionPrice = 5000
+                )
+
+                val granolaProductOption2 = ProductInfo.ProductOptionInfo(
+                    productOptionName = "그래놀라 1kg",
+                    ordering = 2,
+                    productOptionPrice = 10000
+                )
+
+                val granolaProductOption3 = ProductInfo.ProductOptionInfo(
+                    productOptionName = "그래놀라 3kg",
+                    ordering = 3,
+                    productOptionPrice = 2000
+                )
+
+                val granolaProductOptionGroup = ProductInfo.ProductOptionGroupInfo(
+                    productOptionGroupName = "그래놀라 추가",
+                    ordering = 1,
+                    productOptionList = listOf(granolaProductOption, granolaProductOption2, granolaProductOption3)
+                )
+
+                val honeyProductOption = ProductInfo.ProductOptionInfo(
+                    productOptionName = "꿀 500g",
+                    ordering = 1,
+                    productOptionPrice = 3000
+                )
+
+                val honeyProductOption2 = ProductInfo.ProductOptionInfo(
+                    productOptionName = "꿀 1kg",
+                    ordering = 1,
+                    productOptionPrice = 5500
+                )
+
+                val honeyProductOption3 = ProductInfo.ProductOptionInfo(
+                    productOptionName = "꿀 3kg",
+                    ordering = 3,
+                    productOptionPrice = 145000
+                )
+
+                val honeyProductOptionGroup = ProductInfo.ProductOptionGroupInfo(
+                    productOptionGroupName = "꿀 추가",
+                    ordering = 2,
+                    productOptionList = listOf(honeyProductOption, honeyProductOption2, honeyProductOption3)
+                )
+
+                val productOptionGroupList = listOf(granolaProductOptionGroup, honeyProductOptionGroup)
+
+
+                val productCode = UUID.randomUUID().toString()
+                val criteria = ProductCriteria.GetProduct(
+                    productCode = productCode
+                )
+                val expectedInfo = ProductInfo.ProductMain(
+                    productName = fixture<String>(),
+                    productPrice = fixture<Long>(),
+                    productCode = productCode,
+                    status = fixture<Product.Status>(),
+                    productOptionGroupList = productOptionGroupList
+                )
+
+                val expectedResult = ProductResult.ProductMain(
+                    productInfo = expectedInfo
+                )
+
+                val expectedResponse = ProductResponse.RegisterProduct(
+                    productCode = expectedResult.productInfo.productCode
+                )
+
+                "정상적으로 상품 코드를 응답" - {
+                    Mockito.`when`(productFacade.getProduct(criteria)).thenReturn(expectedResult)
+                    val actual = mockMvc.perform(
+                        get("/api/v1/products/$productCode")
+                            .contentType(MediaType.APPLICATION_JSON)
+                    )
+                        .andDo(MockMvcResultHandlers.print())
+                        .andExpect(MockMvcResultMatchers.status().isOk)
+                        .andReturn()
+
+                    val content = actual.response.contentAsString
+                    val response = mapper.readValue<ApiResult<ProductResponse.RegisterProduct>>(content)
+
+                    Assertions.assertThat(response.data).isEqualTo(expectedResponse)
+                }
+            }
         }
+
+
     }
 
 }

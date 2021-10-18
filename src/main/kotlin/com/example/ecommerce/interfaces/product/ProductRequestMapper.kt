@@ -17,8 +17,7 @@ interface ProductRequestMapper {
     @Mappings(
         Mapping(target = "copy", ignore = true)
     )
-    fun to(request: ProductRequest.GetProduct): ProductCriteria.GetProduct
-
+    fun to(productCode: String): ProductCriteria.GetProduct
 
     @Mappings(
         Mapping(target = "copy", ignore = true)

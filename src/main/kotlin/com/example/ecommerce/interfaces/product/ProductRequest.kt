@@ -9,7 +9,4 @@ class ProductRequest {
         val productOptionGroupList: List<ProductOptionGroup>?
     )
 
-    data class GetProduct(
-        val productCode: String,
-    )
 }
